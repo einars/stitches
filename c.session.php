@@ -103,7 +103,8 @@ function sx_close()
 
 function sx_read($session_id)
 {
-    return db::one('select data from sessions where session_id=%s', $session_id);
+    $session = db::one('select data from sessions where session_id=%s', $session_id);
+    return $session;
 }
 
 function sx_write($session_id, $data)

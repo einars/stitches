@@ -47,7 +47,8 @@ STYLE;
             $query = $r['query'];
             $md5 = md5($query);
             printf('<tr class="%s %s"><th>%.1f</th><th>%d</th><td>%s%s</td></tr>',
-                isset($queries[$md5]) ? 'querydebug-duplicate bg-warning' : '',
+                // isset($queries[$md5]) ? 'querydebug-duplicate bg-warning' : '',
+                isset($queries[$md5]) ? 'querydebug-duplicate' : '',
                 $r['time'] > 30 ? 'querydebug-long bg-danger' : '',
                 $r['time'],
                 $r['recs'],

@@ -53,8 +53,8 @@ class S {
             if ($_POST) {
                 array_walk($_POST,   '__stripslashes_array');
             }
-            if ($_COOKIE) {
-                array_walk($_COOKIE, '__stripslashes_array');
+            if ($_REQUEST) {
+                array_walk($_REQUEST, '__stripslashes_array');
             }
         }
 
@@ -78,7 +78,7 @@ class S {
             }
             foreach($_REQUEST as $k=>$v) {
                 if (is_array($v) && ! starts_with('array_', $k)) {
-                    $_POST[$k] = implode(', ', $v);
+                    $_REQUEST[$k] = implode(', ', $v);
                 }
             }
         }
@@ -238,7 +238,7 @@ class S {
         if (isset($routes[$action])) {
             // common case
             s::set('executed-action', $routes[$action]);
-            s::call($routes[$action], null);
+            s::call_array($routes[$action], [null]);
             $had_something_to_do = true;
         } else {
             // check regexps
@@ -306,6 +306,10 @@ class S {
         switch($prefix) {
         case 'sess':
         case 'session':
+            if ( ! isset($_SESSION)) {
+                # init on first access
+                Session::initialize();
+            }
             return isset($_SESSION) ? get($key, $_SESSION) : null;
         case 'cfg':
         case 'config':
@@ -329,6 +333,10 @@ class S {
         switch($prefix) {
         case 'sess':
         case 'session':
+            if ( ! isset($_SESSION)) {
+                # init on first access
+                Session::initialize();
+            }
             $_SESSION[$key] = $value;
             break;
         case 'cfg':
@@ -398,7 +406,6 @@ class S {
     {
         if ( ! ($routes = s::get('routes'))) {
             $route_defaults = [
-                '' => 'on_stitches_default_index',
                 'run-tests' => 'on_stitches_unittests',
                 'install' => 'on_stitches_install',
                 'admin/tests' => 'on_stitches_unittests',
@@ -408,6 +415,10 @@ class S {
 
             $routes = s::emit('routes', $route_defaults);
             $routes = s::process_route_macros($routes);
+
+            if ( ! isset($routes['']) && ! isset($routes['*'])) {
+                $routes[''] = 'on_stitches_default_index';
+            }
             s::set('routes', $routes);
         }
         return $routes;
@@ -481,8 +492,8 @@ class S {
             $permissions = trim($permissions, '()');
             if ($permissions) {
 
-                if ( ! s::has_handler('s:permission-check')) {
-                    s::error('Permissions "%s" requested, but no permission provider installed.', $permissions);
+                if ( ! isset(s::$ev_listeners['permission-check'])) {
+                    s::error('Permissions "%s" requested, but no filter for permission-check event installed.', $permissions);
                 }
 
                 // probably the filter itself will error or redirect already
@@ -577,13 +588,13 @@ class S {
     # The parameter is filtered through all of the event listeners,
     # null return values are ignored;
     # This is used in wrapping the content with base page decorations —
-    # rendered content is filtered through the "content:wrap" event listeners
+    # rendered content is filtered through the "content" event listeners
     # that each return decorated html, like this:
     #
     #   function sample_content_listener($html) {
     #     return '<div class="wrap">' . $html . '</div>';
     #   }
-    #   s::on('content:wrap', 'sample_content_listener');
+    #   s::on('content', 'sample_content_listener');
     #
     # Return failure(..) from a listener to break this event.
 
@@ -634,6 +645,21 @@ class S {
         return $param;
     }
 
+
+    # s::event
+    # --------
+    # Alias of s::emit
+    #
+    static function event($ev_name, $param = null)
+    {
+        return s::emit($ev_name, $param);
+    }
+
+
+    # s::off
+    # ------
+    # Remove one or all listeners from the event.
+    #
     function off($ev_name, $callback = null)
     {
         if ($callback === null) {
@@ -741,7 +767,6 @@ function on_stitches_robots_txt()
 # 
 function stitches_configuration()
 {
-
     Config::define('debug.ip',           null,  'IP addresses for the debug mode');
     Config::define('debug.enabled',      false, 'Global debug mode');
     Config::define('debug.sql',          true,  'Show SQL dumps in the debug mode?');

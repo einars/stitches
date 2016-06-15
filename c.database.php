@@ -577,7 +577,7 @@ class Database {
     }
 
 
-    static function fixup_bools(&$kw_array, $boolean_keys)
+    static function booleanize(&$kw_array, $boolean_keys)
     {
         if ( ! $kw_array) {
             return;

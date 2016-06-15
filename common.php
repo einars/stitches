@@ -780,3 +780,4 @@ function reduce_string($str, $len)
 }
 
 
+

@@ -10,6 +10,25 @@
  */
 
 class HTML {
+
+    # HTML::$handlers
+    # ---------------
+    # Here are stored custom html handlers that are handled via callstatic magic.
+    #
+    static $handlers = [
+        'sample' => 'html::input',
+    ];
+
+    static function __callstatic($function, $args)
+    {
+        $all_args = func_get_args();
+        if ( ! ($handler = get($function, HTML::$handlers))) {
+            s::warn('html::__callstatic: no handler for control %s', $function);
+            return false;
+        }
+        s::call_array($handler, $args);
+    }
+
     static function select($name, $objvalue = Null, $opts = Null)
     {
         normalize_options($opts);
@@ -393,6 +412,7 @@ class HTML {
         $attrs = implode(' ', $attrs);
         echo '<', $tag, ($attrs ? ' ' . $attrs : ''), '>';
     }
+
 
 }
 

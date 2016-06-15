@@ -26,6 +26,7 @@ class Page {
     static $meta = [
         'skype_toolbar' => 'skype_toolbar_parser_compatible',
         'charset' => 'utf-8',
+        'viewport' => 'width=device-width, initial-scale=1',
     ];
 
     static $onload_js = '';
@@ -132,7 +133,7 @@ class Page {
 
     # Page::add_onload_js
     # -------------------
-    # Add some short code to bee added to the function to be called after the
+    # Add some short code to be added to the function to be called after the
     # page initialization.
     #
     #   Page::add_onload_js('console.log("Page loaded.");');
@@ -239,7 +240,7 @@ class Page {
     # Page::present
     # ---------------
     # The main render function that takes some content, wraps it into chrome/wrapper
-    # (by passing through content:wrap event filter) and displays it.
+    # (by passing through content event filter) and displays it.
     #
     # You may respond to events like page:head-start, page:head-end,
     # page:body-start, page:body-end to display anything you'd like.
@@ -256,10 +257,19 @@ class Page {
             return;
         }
 
-        $content = s::emit('content:wrap', $content);
+        $content = s::emit('content', $content);
+
+        s::emit('content-ready');
+
+        $html_class = s::get('page:html-class');
 
         echo "<!DOCTYPE html>\n";
-        echo '<html itemscope itemtype="http://schema.org/" lang="en-us" dir="ltr">';
+        if ($html_class) {
+            h('<html itemscope itemtype="http://schema.org/" lang="en-us" dir="ltr" class="%s">', $html_class);
+        } else {
+            echo '<html itemscope itemtype="http://schema.org/" lang="en-us" dir="ltr">';
+        }
+
         echo '<head>';
         // you may want to print something in response to page:head-start
         s::emit('page:head-start');
@@ -303,6 +313,18 @@ class Page {
             );
         }
 
+        if (Page::$scripts) {
+            foreach(Page::$scripts as $script) {
+                printf('<script type="text/javascript" src="%s"></script>', $script);
+            }
+        }
+
+        if (Page::$onload_js) {
+            echo '<script type="text/javascript">';
+            echo '$(function () {', Page::$onload_js, ' } )';
+            echo '</script>';
+        }
+
 
         if (Page::$custom_head_html) {
             echo implode("\n", Page::$custom_head_html);
@@ -337,7 +359,7 @@ class Page {
     # ----------------------
     # Output custom content_type, disable html wrappers.
     #
-    # content:wrap won't get called, only your function output will be sent by
+    # content won't get called, only your function output will be sent by
     # server.
     #
     # Internally, sets page:plain flag.
@@ -379,7 +401,7 @@ class Page {
     # --------------
     # Returns true/false, depending on whether current execution
     # context asks for a plain output, or decorated (passed through
-    # content:wrap filter and html decorations).
+    # content filter and html decorations).
     #
     # Plain output is used when:
     #  - app is running from command line
@@ -399,7 +421,7 @@ class Page {
     # Returns true if the page was requested via xmlhttprequest.
     #
     # When it is so, the page is rendered without decorations and without
-    # wrapping through content:wrap.
+    # wrapping through content.
     #
     static function is_ajax()
     {

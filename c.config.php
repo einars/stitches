@@ -131,6 +131,7 @@ class Config {
 
         if ( ! s::db()) return;
 
+
         $default_value_s = Config::serialize($default_value, $type);
 
         if ( ! array_key_exists($setting, Config::$values)) {
