@@ -684,5 +684,76 @@ class Database {
 
 
 
+    # db::replace, db::update_by_id
+
+    static function replace($table, &$updates, $primary_key_name = null)
+    {
+        // primary key is assumed to be the first field, unless specified
+        if ( ! $primary_key_name) {
+            $primary_key_name = first_key($updates);
+        }
+        $is_uuid = strpos($primary_key_name, '_uuid') !== false;
+        $row = $updates;
+        if (array_key_exists('ordering', $row) and $row['ordering'] === null) {
+            unset($row['ordering']);
+        }
+        if (isset($updates[$primary_key_name]) and $updates[$primary_key_name]) {
+            list($check) = db::get('select %S from %S where %S=' . ($is_uuid ? '%s' : '%d'),
+                $primary_key_name, $table, $primary_key_name, $updates[$primary_key_name]);
+            if ($check) {
+                db::update_by_id($table, $row, $primary_key_name);
+                return $updates[$primary_key_name];
+            } else {
+                // fall through to insert
+            }
+        }
+
+        if (array_key_exists($primary_key_name, $row) && ! $row[$primary_key_name]) {
+            unset($row[$primary_key_name]);
+        }
+
+        db::insert($table, $row);
+        if ( ! ($new_id = get($primary_key_name, $updates))) {
+            $new_id = db::get_last_id();
+            $updates[$primary_key_name] = $new_id;
+        }
+        if (array_key_exists('ordering', $updates) and $updates['ordering'] === null) {
+            db::query('update %S set ordering=%S where %S=' . ($is_uuid ? '%s' : '%d'),
+                $table,
+                $new_id,
+                $primary_key_name,
+                $new_id
+            );
+        }
+        return $new_id;
+    }
+
+    // $updates contain the primary key name
+    // $update keus starting with "." are hidden and not touched
+    static function update_by_id($table, $updates, $primary_key_name='id')
+    {
+        $upds = [];
+        foreach($updates as $var=>$val) {
+            if ($var != $primary_key_name and $var[0] != '.') {
+                if ($var[0] == '~') {
+                    $upds[] = sprintf('%s=%s', substr($var, 1), $val);
+                } else {
+                    $field = $var;
+                    $value = db::as_string($val);
+                    $upds[] = sprintf('%s=%s', $var, db::as_string($val));
+                }
+            }
+        }
+
+        $upds = implode(', ', $upds);
+
+        $is_uuid = strpos($primary_key_name, '_uuid') !== false;
+        if( $is_uuid) {
+            return db::query("update $table set $upds where $primary_key_name='"  . $updates[$primary_key_name] . "'");
+        } else {
+            return db::query("update $table set $upds where $primary_key_name="  . $updates[$primary_key_name]);
+        }
+    }
+
 
 }

@@ -24,7 +24,7 @@ class S {
     static $class_search_patterns = [ 'c.%s.php', '%s.class.php', 'cla_%s.php' ];
 
     # config passed in by s::configure()
-    static $config = [];
+    static $config = null;
 
 
     # s::startup
@@ -33,7 +33,8 @@ class S {
     #
     static function _startup()
     {
-        $path_to_stitches = dirname(__FILE__);
+        error_reporting(E_ALL);
+
         s::set('start-time', microtime(true));
 
         if (get_magic_quotes_gpc()) {
@@ -114,7 +115,7 @@ class S {
         if (file_exists('./site')) {
             S::add_class_path('./site');
         }
-        S::add_class_path($path_to_stitches);
+        S::add_class_path(dirname(__FILE__));
 
         if (function_exists('spl_autoload_register')) {
             spl_autoload_register('stitches_autoload');
@@ -150,6 +151,28 @@ class S {
         # the actual connection will happen only when it's first used,
         # typically — when sessions initialize
 
+        // action to be executed is determined before s::run()
+        //
+        // if you need to, you may modify s::get('action') between calls
+        // to s::configure() and s::run()
+        //
+        if (s::cli()) {
+            global $argv;
+            $action = get(1, $argv);
+        } else {
+
+            $get_action = get_string('action', $_GET);
+            $post_action = get_string('action', $_POST);
+
+            $action = trim(any($post_action, $get_action), '/');
+        }
+
+        if ($action === 'install') {
+            define('STITCHES_INSTALLING', true);
+        }
+
+        s::set('action', $action);
+
         Config::load();
         s::on('configure', 'stitches_configuration');
 
@@ -168,40 +191,24 @@ class S {
             s::enable_debug_mode();
         }
 
-        // Cache::load();
-
     }
 
     static /* exit */ function run()
     {
-        if (s::cli()) {
-            global $argv;
-            $action = get(1, $argv);
-        } else {
+        if (s::$settings === null) {
+            # you want to run with empty settings? ok, why not
+            s::configure([]);
+        }
+ 
 
-            $get_action = get_string('action', $_GET);
-            $post_action = get_string('action', $_POST);
+        Session::initialize();
 
-            $action = trim(any($post_action, $get_action), '/');
-
-            if ($action === 'install') {
-                define('STITCHES_INSTALLING', true);
-            }
-
-            // session::initialize might do some checks on installation
-            Session::initialize();
-
-            if (isset(s::$ev_listeners['preprocess_url'])) {
-                $action = s::emit('preprocess_url', explode('/', $action));
-                $action = implode('/', $action);
-            }
-
+        if ( ! s::cli()) {
             Page::set_canonical_url(get('REQUEST_URI', $_SERVER));
-
         }
 
         try {
-            s::execute($action);
+            s::execute(s::get('action'));
         } catch (Exception $e) {
             s::error('Uncaught exception: ' . $e->getMessage());
         }

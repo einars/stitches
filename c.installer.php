@@ -48,11 +48,11 @@ class Installer {
             }
 
             $title   = $obj->get_title();
-            $is_done = $obj->is_done();
+            $is_applied = $obj->is_applied();
 
-            Installer::$steps[ $class_name ] = $is_done;
+            Installer::$steps[ $class_name ] = $is_applied;
 
-            if ($is_done) continue;
+            if ($is_applied) continue;
 
             echo '<div class="installer-task installer-task-unapplied">';
             h('<h2 class="installer-task-title">%s</h2>' , $title);
@@ -65,7 +65,7 @@ class Installer {
                 if (Installer::exec_step($obj)) {
                     Page::reload();
                 } else {
-                    $is_done = false;
+                    $is_applied = false;
                     h('<p class="installer-message">%s</p>'
                         , 'Installation attempted, but remains incomplete.');
 
@@ -75,12 +75,12 @@ class Installer {
             echo '</div>';
         }
 
-        $n_done = 0;
+        $n_applied = 0;
         $n_remaining = 0;
 
-        foreach(Installer::$steps as $class_name => $is_done) {
-            if ($is_done) {
-                $n_done++;
+        foreach(Installer::$steps as $class_name => $is_applied) {
+            if ($is_applied) {
+                $n_applied++;
             } else {
                 $n_remaining++;
             }
@@ -119,7 +119,7 @@ class Installer {
 
             foreach(Installer::$steps as $class_name=>$foo) {
                 $obj = new $class_name();
-                if ( ! $obj->is_done()) {
+                if ( ! $obj->is_applied()) {
 
                     if (s::cli()) {
                         h("%s\n", $class_name);
@@ -166,11 +166,11 @@ class Installer {
     static function exec_step($step_obj)
     {
         $res = false;
-        if ( ! $step_obj->is_done()) {
-            $step_obj->do();
-            $res = $step_obj->is_done();
+        if ( ! $step_obj->is_applied()) {
+            $step_obj->apply();
+            $res = $step_obj->is_applied();
             if ($res) {
-                $step_obj->when_done();
+                $step_obj->when_applied();
             }
         }
         return $res;
@@ -191,19 +191,19 @@ class Installer {
 
 class InstallerTask
 {
-    function do()
+    function apply()
     {
-        s::warn('You have to override InstallerTask::do');
+        s::warn('You have to override InstallerTask::apply');
         // override me
     }
 
-    function is_done()
+    function is_applied()
     {
-        s::warn('You have to override InstallerTask::is_done');
+        s::warn('You have to override InstallerTask::is_applied');
         return false;
     }
 
-    public function when_done()
+    public function when_applied()
     {
         // you may override this, for some additional steps to be taken
     }
@@ -240,7 +240,7 @@ class InstallerTableTask extends InstallerTask
         return hs('Create table %s', $this->get_name());
     }
 
-    function is_done()
+    function is_applied()
     {
 
         if ( ! s::db()) {
@@ -254,7 +254,7 @@ class InstallerTableTask extends InstallerTask
         return db::table_exists($name);
     }
 
-    function do()
+    function apply()
     {
         db::query($this->get_sql());
     }

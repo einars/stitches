@@ -26,7 +26,7 @@ class Config {
         if (Config::$initialized) return;
         Config::$initialized = true;
 
-        if ( ! s::db()) {
+        if ( ! s::db() || defined('STITCHES_INSTALLING')) {
             return; // don't do anything
         }
 
@@ -129,7 +129,12 @@ class Config {
             $type = 'bool';
         }
 
-        if ( ! s::db()) return;
+        if ( ! s::db() || defined('STITCHES_INSTALLING')) {
+            # run with default values while installing
+            Config::$values[$setting]   = $default_value;
+            Config::$types[$setting]    = $type;
+            return;
+        }
 
 
         $default_value_s = Config::serialize($default_value, $type);

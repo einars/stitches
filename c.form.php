@@ -22,7 +22,7 @@
 
 class Form {
 
-    static $class_button_wrapper = 'form-button-bar';
+    static $class_button_wrapper = 'form-group form-button-bar';
     static $class_button = 'btn btn-default';
     static $class_button_submit = 'btn btn-primary';
     static $class_checkbox_wrapper = 'checkbox';
@@ -36,6 +36,7 @@ class Form {
     static $class_label_selected = 'control-label-selected';
 
     static $grid = [
+        'grid' => 3,
         'layout' => 'form-horizontal',
         'label' => 'col-sm-3',
         'content' => 'col-sm-9',
@@ -77,27 +78,48 @@ class Form {
 
     static function set_grid($label_size)
     {
-        Form::$grid['label'] = sprintf('col-sm-%d', $label_size);
-        Form::$grid['content'] = sprintf('col-sm-%d', 12 - $label_size);
-        Form::$grid['offset'] = sprintf('col-sm-offset-%d', $label_size);
+        Form::$grid['grid'] = $label_size;
+        if ($label_size) {
+            Form::$grid['label'] = sprintf('col-sm-%d', $label_size);
+            Form::$grid['content'] = sprintf('col-sm-%d', 12 - $label_size);
+            Form::$grid['offset'] = sprintf('col-sm-offset-%d', $label_size);
+        } else {
+            Form::$grid['label'] = '';
+            // Form::$grid['content'] = 'col-sm-12';
+            Form::$grid['content'] = '';
+            Form::$grid['offset'] = '';
+        }
     }
 
 
     static function begin($notice = null, $opts = null)
     {
         HTML::form($opts);
-        h('<div class="%s">', Form::$grid['layout']);
+        $layout = get_option($opts, 'layout', Form::$grid['layout']);
+        h('<div class="%s">', $layout);
         HTML::hidden('save', 'yes');
-        print_notice($notice);
+        if ($notice) {
+            if (is_string($notice)) {
+                $class = 'notice notice-success text-success bg-success';
+                $text = $notice;
+                Form::draw_static_text('text', ['', $notice, ['class' => 'notice notice-success']]);
+            } else {
+                $class = 'notice notice-failure text-danger bg-danger';
+                $text = failure_text($notice);
+            }
+            Form::draw_static_text('text', ['', "<div class='$class'>$text</div>"]);
+        }
     }
 
     static function buttons_start()
     {
         h('<div class="%s">', Form::$class_button_wrapper);
         h('<div class="%s"></div>', Form::$grid['label']);
+        h('<div class="%s">', Form::$grid['content']);
     }
     static function buttons_end()
     {
+        echo '</div>';
         echo '</div>';
     }
 
@@ -146,6 +168,10 @@ class Form {
     }
 
 
+    # form::draw_control
+    # ------------------
+    # Draw a html::* control with a (name, value, opts) calling convention
+    #
     static function draw_control($element_type, $args)
     {
         // html::inputs have calling convention of (name, value, opts)
@@ -155,63 +181,50 @@ class Form {
         $opts  = get(2, $args);
 
         Form::normalize_opts($opts, $require_id = true);
-
         $opt_label = get_option($opts, 'label', null);
+        $opt_hint = get_option($opts, 'hint', null);
         $opt_wrapper_class = get_option($opts, 'wrapper-class', null);
 
-        h('<div class="%s %s-%s %s">'
-            , Form::$class_form_group
-            , Form::$class_form_group
-            , safe_name($element_type, $delimiter = '-')
-            , $opt_wrapper_class
-        );
+        $classes = [];
+        $classes[] = Form::$class_form_group;
+        $classes[] = Form::$class_form_group . '-' . safe_name($element_type, $delimiter = '-');
+        if ($opt_wrapper_class) {
+            $classes[] = $opt_wrapper_class;
+        }
+        h('<div class="%s">', implode(' ', $classes));
 
-        $opts_no_class = $opts;
-        $opts_no_class['class'] = [
-            Form::$class_label, Form::$grid['label']
-        ];
-        HTML::label($opt_label, $opts_no_class);
+        if ($opt_label || form::$grid['grid']) {
+            # make a copy
+            $opts_for_label = $opts;
+            unset($opts['label']);
 
-        unset($opts['label']);
+            $opts_for_label['class'] = [
+                Form::$class_label, Form::$grid['label']
+            ];
+            HTML::label($opt_label, $opts_for_label);
 
-        h('<div class="%s">', Form::$grid['content']);
+        }
+
+
+        if ($opt_label || form::$grid['grid']) {
+            h('<div class="%s">', Form::$grid['content']);
+        } else {
+            h('<div>');
+        }
+
         $opts['class'][] = Form::$class_form_control;
         s::call('html::' . $element_type, $name, $value, $opts);
-        echo '</div>';
 
-        echo '</div>';
-    }
+        if ($opt_hint) {
+            h('<p class="text-muted">%s</p>', $opt_hint);
+        }
 
-
-    /*
-    #   Form::$handlers['my_element'] = 'form::draw_anything_with_label');
-    #   Form::my_element('Label', 1, 2, 3);
-    #
-    # will result in a pretty div with a label, and contents of
-    #
-    #   html::my_element(1, 2, 3);
-    #
-    # alongside it
-    static function draw_control($element_type, $args)
-    {
-        // pass everything directly to the html, drawing label
-        $label = array_shift($args);
-
-        h('<div class="%s %s-%s">'
-            , Form::$class_form_group
-            , Form::$class_form_group
-            , safe_name($element_type, $delimiter = '-')
-        );
-
-        HTML::label($label, ['class' => [Form::$class_label, Form::$grid['label']]]);
-
-        h('<div class="%s">', Form::$grid['content']);
-        s::call_array('html::' . $element_type, $args);
         echo '</div>';
 
         echo '</div>';
     }
-     */
+
+
 
     # plain, labelled html
     static function draw_static_text($element_type, $args)
@@ -224,11 +237,23 @@ class Form {
             , 'text'
         );
 
-        HTML::label($label, ['class' => [Form::$class_label, Form::$grid['label']]]);
+        if ($label || form::$grid['grid']) {
+            HTML::label($label, ['class' => [Form::$class_label, Form::$grid['label']]]);
+        }
 
-        h('<div class="%s %s">', Form::$class_text, Form::$grid['content']);
-        s::call_array('html::' . $element_type, $args);
+        if ($label !== false) {
+            h('<div class="%s">', Form::$grid['content']);
+        }
+        h('<div class="%s">', Form::$class_text);
+        if ($element_type === 'text') {
+            echo $args[0];
+        } else {
+            s::call_array('html::' . $element_type, $args);
+        }
         echo '</div>';
+        if ($label !== false) {
+            h('</div>');
+        }
 
         echo '</div>';
     }
@@ -302,22 +327,31 @@ class Form {
     # -------------
     # A simple confirmation drop-in.
     #
-    # Caveat: doesn't forward request query parameters, all of the data needs
-    # to be inside the url - /users/12, not users/?id=12
-    # 
     #   if (form::confirm('Really delete this record?')) {
     #     db::query('delete from my_table where record_id=%d', $id);
     #   }
     #
     static function confirm($message, $opts = null)
     {
+        $opt_cancel_label = get_option($opts, 'cancel-label', 'Cancel');
         $key = md5($message);
         if (get('confirmed', $_POST) == $key) {
             return true;
         }
-        form::begin(array('class' => 'confirmation'));
+        $grid = form::$grid['grid'];
+        form::set_grid(0);
+
+        form::begin(null, array('class' => 'confirmation'));
         form::hidden('confirmed', $key);
-        form::end($message);
+        foreach($_GET as $k=>$v) {
+            form::hidden($k, $v);
+        }
+        form::submit($message);
+        if ($opt_cancel_label !== false) {
+            h('<a href="?" class="btn btn-default small-margin-left">%s</a>', $opt_cancel_label);
+        }
+        form::end();
+        form::set_grid($grid);
     }
 
 
@@ -365,4 +399,29 @@ class Form {
         $ids[$key] = (($id = get($key, $ids, 1))) + 1;
         return $key . '-' . $id;
     }
+
+    # form::install_control
+    # ---------------------
+    # Install a new custom control handler
+    #
+    #   form::install_control('my_elem', 'draw_my_elem');
+    #   function draw_my_elem($name, $value, $opts) {
+    #     $value = html::extract($name, $value);
+    #     // draw your input element
+    #     ...
+    #   }
+    #
+    # Now you can use the new element:
+    #
+    #   form::my_elem($name, $value, [
+    #     'label' => 'prettiness',
+    #   ]);
+    #
+    static function install_control($control, $handler)
+    {
+        html::$handlers[$control] = $handler;
+        form::$handlers[$control] = 'form::draw_control';
+    }
+
+
 }

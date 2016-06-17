@@ -79,6 +79,8 @@ class HTML {
         $opt_for = get_option($opts, 'for');
         $opt_class = get_option($opts, 'class');
 
+        if ($title === false) return;
+
         # only class and id/for are passed to label.
         $label_opts = [
             'class' => $opt_class,
@@ -252,69 +254,9 @@ class HTML {
     {
         normalize_options($opts);
         $value = HTML::extract($name, $objvalue);
+        $opts['name'] = $name;
 
         HTML::wrapped_tag('textarea', htmlspecialchars($value), $opts);
-
-    }
-
-    static function options($name, $objvalue = Null, $opts = Null)
-    {
-        $opts         = normalize_options($opts);
-        $opt_id          = get_option($opts, 'id', $name);
-        $opt_description = get_option($opts, 'description');
-        $opt_choices     = get_option($opts, 'choices');
-        $opt_label_first = get_option($opts, 'label-first', false);
-        $opt_strong_selected = get_option($opts, 'strong-selected', false);
-        // UNUSED:
-        $opt_label       = get_option($opts, 'label');
-
-        if ( ! $opt_choices) {
-            trigger_error('HTML::options requires option "choices", associative array of optiongroup choices.', E_USER_ERROR);
-        }
-
-        $value = HTML::extract($name, $objvalue);
-
-        $n = 0;
-
-
-        $has_selected_element = isset($opt_choices[$value]);
-        if ($opt_strong_selected and $has_selected_element) {
-            $opt_choices[$value] = '<strong>' . $opt_choices[$value] . '</strong>';
-        }
-
-        if ( ! $has_selected_element) {
-            $value = first_key($opt_choices);
-        }
-
-        printf('<div class="radios" id="%s">', $opt_id);
-        foreach($opt_choices as $k=>$v) {
-            $n++;
-            $input_id = $opt_id . '_' . $n;
-            $is_checked = $k == $value;
-
-            if ($opt_label_first) {
-                $opts = array('style' => 'cursor: pointer');
-                if ($is_checked) {
-                    $opts['class'] = 'selected';
-                }
-                HTML::label($input_id, $v, $opts);
-            }
-
-            hprintf('<input type="radio" class="radio" name="%s" id="%s" value="%s"',
-                $name,
-                $input_id,
-                $k);
-            echo $is_checked ? ' checked="checked"' : Null;
-            echo '/> ';
-            if ( ! $opt_label_first) {
-                HTML::label($input_id, $v, array('style'=>'cursor:pointer', 'class' => 'for-radio' . ($is_checked ? ' selected' : '')));
-            }
-            echo '<br />';
-
-        }
-        echo '</div>';
-
-
 
     }
 
@@ -389,10 +331,12 @@ class HTML {
         normalize_opts($opts);
 
         $attrs = array();
+        $skip_attrs = ['choices','layout', 'label', 'hint', 'wrapper-class'];
         foreach($opts as $k=>$v) {
 
             # skip anything starting with a dot — some system entries
             if ($k && $k[0] == '.') continue;
+            if (in_array($k, $skip_attrs)) continue;
 
             if ($v === false) {
                 // hmm
