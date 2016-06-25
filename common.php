@@ -781,3 +781,52 @@ function reduce_string($str, $len)
 
 
 
+
+function mkdir_recursive($folder)
+{
+    if (file_exists($folder)) {
+        if (is_file($folder)) {
+            s::error('mkdir_recursive: %s is a regular file', $folder);
+        }
+        return;
+    }
+    $base = '.';
+    if ($folder[0] == '/') {
+        $base = '/';
+        $folder = trim($folder, '/');
+    }
+    $parts = explode('/', $folder);
+    foreach($parts as $p) {
+        $base .= '/' . $p;
+        if ( ! file_exists($base)) {
+            @mkdir($base);
+            if ( ! file_exists($base)) {
+                s::error('mkdir_recursive: unable to create folder %s', $base);
+            }
+        }
+    }
+}
+
+function safe_file_name($file_name, $force_extension = null)
+{
+    if (strpos($file_name, '.') === false) {
+        $file_name .= '.';
+    }
+
+    if ($force_extension === null) {
+        $force_extension = '.' . safe_name(substr($file_name, strrpos($file_name, '.') + 1));
+    } else {
+        if ($force_extension != '') {
+            $force_extension = '.' . $force_extension;
+        }
+    }
+    $f = substr($file_name, 0, strrpos($file_name, '.'));
+    $out = rtrim(safe_name($f) . $force_extension, '.');
+    return $out ? $out : Null;
+}
+
+
+
+
+
+

@@ -182,8 +182,9 @@ class Form {
 
         Form::normalize_opts($opts, $require_id = true);
         $opt_label = get_option($opts, 'label', null);
-        $opt_hint = get_option($opts, 'hint', null);
         $opt_wrapper_class = get_option($opts, 'wrapper-class', null);
+        $opt_form_hint = get_option($opts, 'form-hint', null);
+        $opt_form_control_class = get_option($opts, 'form-control-class', Form::$class_form_control);
 
         $classes = [];
         $classes[] = Form::$class_form_group;
@@ -212,11 +213,15 @@ class Form {
             h('<div>');
         }
 
-        $opts['class'][] = Form::$class_form_control;
+        if ($element_type === 'file' || ! $opt_form_control_class) {
+            // skip class for file inputs:
+        } else{
+            $opts['class'][] = $opt_form_control_class;
+        }
         s::call('html::' . $element_type, $name, $value, $opts);
 
-        if ($opt_hint) {
-            h('<p class="text-muted">%s</p>', $opt_hint);
+        if ($opt_form_hint) {
+            h('<p class="help-block">%s</p>', $opt_form_hint);
         }
 
         echo '</div>';
@@ -289,7 +294,7 @@ class Form {
                 h('<label class="%s">', Form::$class_label);
             }
             html::radio($name, ($k == $value), [
-                'value' => $value,
+                'value' => $k,
             ]);
 
             echo $v; // non-escaped

@@ -464,9 +464,10 @@ class Page {
     {
         header('HTTP/1.0 ' . $header);
 
-        header('Content-type: text/html; charset=utf-8');
-
-        echo '<h1 style="font-size: 22px; font-family: sans-serif; font-weight: normal;">' . $header . '</h1>';
-        h('<p style="font-size: 12px;">%s</p>', $message);
+        $content = 
+            '<h1 style="font-size: 22px; font-family: sans-serif; font-weight: normal;">' . $header . '</h1>';
+        $content .=
+            hs('<p style="font-size: 12px;">%s</p>', $message);
+        echo page::present($content);
     }
 }

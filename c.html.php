@@ -271,7 +271,8 @@ class HTML {
         $opts['method'] = $opt_method;
         $opts['action'] = $opt_action;
         if ($opt_multipart) {
-            $opts['.attributes']['enctype'] = 'multipart/form-data';
+            $opts['enctype'] = 'multipart/form-data';
+            unset($opts['multipart']);
         }
 
         HTML::tag('form', $opts);
@@ -331,12 +332,13 @@ class HTML {
         normalize_opts($opts);
 
         $attrs = array();
-        $skip_attrs = ['choices','layout', 'label', 'hint', 'wrapper-class'];
+        $skip_attrs = ['choices','layout', 'label', 'wrapper-class'];
         foreach($opts as $k=>$v) {
 
             # skip anything starting with a dot — some system entries
             if ($k && $k[0] == '.') continue;
             if (in_array($k, $skip_attrs)) continue;
+            if (starts_with('form-', $k)) continue;
 
             if ($v === false) {
                 // hmm
