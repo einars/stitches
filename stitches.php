@@ -195,7 +195,7 @@ class S {
 
     static /* exit */ function run()
     {
-        if (s::$settings === null) {
+        if (sizeof(s::$settings) === 1) {
             # you want to run with empty settings? ok, why not
             s::configure([]);
         }
@@ -802,4 +802,9 @@ function stitches_debug_message($message)
     } else {
         h('<p class="stitches-debug">%s</p>', $message);
     }
+}
+
+function redirect($url)
+{
+    return page::redirect($url);
 }

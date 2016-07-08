@@ -154,13 +154,15 @@ class Form {
         HTML::button($title, $opts);
     }
 
-    static function checkbox($name, $objvalue, $opts)
+    static function ctrl_checkbox($name, $objvalue, $opts)
     {
         Form::normalize_opts($opts, $require_id = false);
         $opt_label = get_option($opts, 'label');
+
         $opts['type'] = 'checkbox';
-        h('<div class="%s %s">', Form::$class_checkbox_wrapper, Form::$grid['offset']);
-        h('<label class="%s">', Form::$class_label);
+        h('<div class="%s">', Form::$class_checkbox_wrapper);
+        // h('<label class="%s">', Form::$class_label);
+        h('<label>'); // no need for a label class in bootstrap checkbox
         HTML::checkbox($name, $objvalue, $opts);
         echo any($opt_label, $name);
         echo '</label>';
@@ -186,12 +188,16 @@ class Form {
         $opt_form_hint = get_option($opts, 'form-hint', null);
         $opt_form_control_class = get_option($opts, 'form-control-class', Form::$class_form_control);
 
+        $no_label_for = ['checkbox'];
+        $no_control_class = ['checkbox', 'file'];
+
         $classes = [];
         $classes[] = Form::$class_form_group;
-        $classes[] = Form::$class_form_group . '-' . safe_name($element_type, $delimiter = '-');
+        $classes[] = 'form-group-' . safe_name($element_type, $delimiter = '-');
         if ($opt_wrapper_class) {
             $classes[] = $opt_wrapper_class;
         }
+
         h('<div class="%s">', implode(' ', $classes));
 
         if ($opt_label || form::$grid['grid']) {
@@ -202,7 +208,12 @@ class Form {
             $opts_for_label['class'] = [
                 Form::$class_label, Form::$grid['label']
             ];
-            HTML::label($opt_label, $opts_for_label);
+            if (in_array($element_type, $no_label_for)) {
+                // 
+                HTML::label('&nbsp;', $opts_for_label);
+            } else {
+                HTML::label($opt_label, $opts_for_label);
+            }
 
         }
 
@@ -213,12 +224,18 @@ class Form {
             h('<div>');
         }
 
-        if ($element_type === 'file' || ! $opt_form_control_class) {
+        if (in_array($element_type, $no_control_class) || ! $opt_form_control_class) {
             // skip class for file inputs:
         } else{
             $opts['class'][] = $opt_form_control_class;
         }
-        s::call('html::' . $element_type, $name, $value, $opts);
+        switch($element_type) {
+        case 'checkbox':
+            form::ctrl_checkbox($name, $value, $opts + ['label' => $opt_label]);
+            break;
+        default:
+            s::call('html::' . $element_type, $name, $value, $opts);
+        }
 
         if ($opt_form_hint) {
             h('<p class="help-block">%s</p>', $opt_form_hint);
@@ -236,10 +253,9 @@ class Form {
     {
         $label = array_shift($args);
 
-        h('<div class="%s %s-%s">'
+        h('<div class="%s %s">'
             , Form::$class_form_group
-            , Form::$class_form_group
-            , 'text'
+            , 'form-group-text'
         );
 
         if ($label || form::$grid['grid']) {
@@ -289,9 +305,9 @@ class Form {
             $checked = ($k == $value); // sic: inexact comparison, == to simplify numeric indices
             
             if ($checked) {
-                h('<label class="%s %s">', Form::$class_label, Form::$class_label_selected);
+                h('<label class="%s">', Form::$class_label_selected);
             } else {
-                h('<label class="%s">', Form::$class_label);
+                h('<label>', Form::$class_label);
             }
             html::radio($name, ($k == $value), [
                 'value' => $k,
@@ -310,18 +326,16 @@ class Form {
         Form::normalize_opts($opts);
         $opt_label = get_option($opts, 'label');
 
-        h('<div class="%s %s-%s %s">'
+        h('<div class="%s %s">'
             , Form::$class_form_group
-            , Form::$class_form_group
-            , 'optiongroup'
-            , Form::$grid['label']
+            , 'form-group-optiongroup'
         );
 
         HTML::label($opt_label, ['class' => [Form::$class_label, Form::$grid['label']]]);
 
         h('<div class="%s">', Form::$grid['content']);
 
-        Form::optiongroup_inside($name, $objvalue, $opts);
+        Form::ctrl_optiongroup($name, $objvalue, $opts);
 
         echo '</div>'; // grid['content']
         echo '</div>'; // form-group

@@ -80,6 +80,12 @@ class Page {
         }
     }
 
+    static function noindex()
+    {
+        Page::set_meta('robots', 'noindex, nofollow');
+    }
+
+    #
     # Page::add_script
     # ----------------
     #

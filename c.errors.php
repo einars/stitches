@@ -154,6 +154,11 @@ class Errors {
         errors::error_page_helper($args, '404 Not Found');
     }
 
+    static function clear()
+    {
+        s::set('was_error', false);
+        s::set('last_error', null);
+    }
     static function style()
     {
 

@@ -411,6 +411,7 @@ function get_postdef($r)
 
 function indent($lines, $spaces = 4)
 {
+    if ( ! $lines) return;
     $indentation = str_repeat(' ', $spaces);
     $out = [];
     foreach($lines as $line) {
