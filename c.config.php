@@ -26,7 +26,7 @@ class Config {
         if (Config::$initialized) return;
         Config::$initialized = true;
 
-        if ( ! s::db() || defined('STITCHES_INSTALLING')) {
+        if ( ! Config::use_db()) {
             return; // don't do anything
         }
 
@@ -106,7 +106,7 @@ class Config {
 
         if (Config::$values[$setting] == $value) return;
 
-        if (s::db()) {
+        if (Config::use_db()) {
             db::query('update configuration set value=%s where setting=%s'
                 , config::serialize($value, Config::$types[$setting])
                 , $setting
@@ -129,7 +129,7 @@ class Config {
             $type = 'bool';
         }
 
-        if ( ! s::db() || defined('STITCHES_INSTALLING')) {
+        if ( ! Config::use_db()) {
             # run with default values while installing
             Config::$values[$setting]   = $default_value;
             Config::$types[$setting]    = $type;
@@ -168,7 +168,7 @@ class Config {
 
     static function install()
     {
-        if ( ! s::db()) {
+        if ( ! Config::use_db()) {
             return;
         }
 
@@ -192,10 +192,18 @@ create table configuration(
 
     static function deprecate($setting)
     {
-        if (s::db()) {
+        if (Config::use_db()) {
             db::query('update configuration set is_deprecated=true where setting=%s', $setting);
         }
     }
 
+
+    static function use_db()
+    {
+        if ( ! s::db()) return false;
+        if (defined('STITCHES_INSTALLING')) return false;
+        if (get('db.alien', s::$config)) return false;
+        return true;
+    }
 }
 

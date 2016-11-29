@@ -19,6 +19,9 @@
 #  db.host:     host to connect to
 #  db.port:     tcp port for connecting
 #
+#  db.alien:    prevents creation of stitches-specific things, e.g
+#               configuration table
+#
 # Mysql-specific settings:
 #  db.socket:   socket to use instead of tcp port
 #  db.charset:  default utf8

@@ -17,8 +17,6 @@ class db extends Database
 
         $opt_charset   = get_option($options, 'db.charset', 'utf8');
 
-        $opt_debug     = R::is_debug_mode();
-
         $connection_id = @mysqli_connect($opt_host, $opt_user_name, $opt_password, $opt_database, $opt_port, $opt_socket);
 
         if ($connection_id) {
