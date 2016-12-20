@@ -14,20 +14,20 @@ class Page {
     static $title = 'Untitled';
     static $content_type = 'text/html; charset=utf-8';
 
-    static $custom_head_html = []; 
-    static $body_classes = []; 
+    static $custom_head_html = array(); 
+    static $body_classes = array(); 
 
-    static $scripts = []; // { short_name => url, ... }
-    static $stylesheets = []; // [ {url, media, conditiona}, ... ]
-    static $style = []; // [ media => css_code ]
+    static $scripts = array(); // { short_name => url, ... }
+    static $stylesheets = array(); // [ {url, media, conditiona}, ... ]
+    static $style = array(); // [ media => css_code ]
 
     static $favicon = null;
 
-    static $meta = [
+    static $meta = array(
         'skype_toolbar' => 'skype_toolbar_parser_compatible',
         'charset' => 'utf-8',
         'viewport' => 'width=device-width, initial-scale=1',
-    ];
+    );
 
     static $onload_js = '';
 

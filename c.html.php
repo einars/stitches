@@ -15,9 +15,9 @@ class HTML {
     # ---------------
     # Here are stored custom html handlers that are handled via callstatic magic.
     #
-    static $handlers = [
+    static $handlers = array(
         'sample' => 'html::input',
-    ];
+    );
 
     static function __callstatic($function, $args)
     {
@@ -82,10 +82,10 @@ class HTML {
         if ($title === false) return;
 
         # only class and id/for are passed to label.
-        $label_opts = [
+        $label_opts = array(
             'class' => $opt_class,
             'for' => $opt_for ? $opt_for : $opt_id
-        ];
+        );
 
         HTML::wrapped_tag('label', $title, $label_opts);
     }
@@ -332,7 +332,7 @@ class HTML {
         normalize_opts($opts);
 
         $attrs = array();
-        $skip_attrs = ['choices','layout', 'label', 'wrapper-class'];
+        $skip_attrs = array('choices','layout', 'label', 'wrapper-class');
         foreach($opts as $k=>$v) {
 
             # skip anything starting with a dot — some system entries

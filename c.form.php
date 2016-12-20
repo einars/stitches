@@ -35,15 +35,15 @@ class Form {
     static $class_label = 'control-label';
     static $class_label_selected = 'control-label-selected';
 
-    static $grid = [
+    static $grid = array(
         'grid' => 3,
         'layout' => 'form-horizontal',
         'label' => 'col-sm-3',
         'content' => 'col-sm-9',
         'offset' => 'col-sm-offset-3',
-    ];
+    );
 
-    static $handlers = [
+    static $handlers = array(
 
         '*' => 'form::draw_control',
 
@@ -62,7 +62,7 @@ class Form {
         'h3' => 'form::direct_to_html',
         'h4' => 'form::direct_to_html',
         'p'  => 'form::direct_to_html',
-    ];
+    );
 
     static function __callstatic($function, $args)
     {
@@ -188,10 +188,10 @@ class Form {
         $opt_form_hint = get_option($opts, 'form-hint', null);
         $opt_form_control_class = get_option($opts, 'form-control-class', Form::$class_form_control);
 
-        $no_label_for = ['checkbox'];
-        $no_control_class = ['checkbox', 'file'];
+        $no_label_for = array('checkbox');
+        $no_control_class = array('checkbox', 'file');
 
-        $classes = [];
+        $classes = array();
         $classes[] = Form::$class_form_group;
         $classes[] = 'form-group-' . safe_name($element_type, $delimiter = '-');
         if ($opt_wrapper_class) {
@@ -205,9 +205,9 @@ class Form {
             $opts_for_label = $opts;
             unset($opts['label']);
 
-            $opts_for_label['class'] = [
+            $opts_for_label['class'] = array(
                 Form::$class_label, Form::$grid['label']
-            ];
+            );
             if (in_array($element_type, $no_label_for)) {
                 // 
                 HTML::label('&nbsp;', $opts_for_label);
@@ -389,7 +389,7 @@ class Form {
                 $opts['class'] = explode(' ', $opts['class']);
             }
         } else {
-            $opts['class'] = [];
+            $opts['class'] = array();
         }
 
         if ($require_id && ! isset($opts['id'])) {
@@ -410,7 +410,7 @@ class Form {
     #
     static function next_id($key)
     {
-        static $ids = [];
+        static $ids = array();
 
         # make keys prettier
         $key = str_replace('_', '-', $key);

@@ -124,7 +124,7 @@ class Database {
             $args = func_get_args();
             $query = db::sprintf_array($args);
         }
-        $out = [];
+        $out = array();
         $res = db::query($query);
         while (list($n) = db::fetch_num($res)) {
             $out[] = $n;
@@ -735,7 +735,7 @@ class Database {
     // $update keus starting with "." are hidden and not touched
     static function update_by_id($table, $updates, $primary_key_name='id')
     {
-        $upds = [];
+        $upds = array();
         foreach($updates as $var=>$val) {
             if ($var != $primary_key_name and $var[0] != '.') {
                 if ($var[0] == '~') {

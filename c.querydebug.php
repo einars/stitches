@@ -8,7 +8,7 @@
 class querydebug {
 
     static $log_limit = 100;
-    static $log = [];
+    static $log = array();
 
     static function load()
     {
@@ -21,11 +21,11 @@ class querydebug {
         if (sizeof(querydebug::$log) > querydebug::$log_limit) {
             return;
         }
-        querydebug::$log[] = [
+        querydebug::$log[] = array(
             'time' => $ev['time'] * 1000,
             'query' => $ev['query'],
             'recs' => is_bool($ev['result']) ? -1 : db::num_rows($ev['result']),
-        ];
+        );
     }
 
     static function show()

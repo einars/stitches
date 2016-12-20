@@ -10,8 +10,8 @@
 #   TK
 
 class Config {
-    static $values = [];
-    static $types = [];
+    static $values = array();
+    static $types = array();
 
     static $initialized = false;
 

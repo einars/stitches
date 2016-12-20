@@ -14,14 +14,14 @@ s::_startup();
 class S {
 
     # all settings set by s::set('something') go here
-    static $settings = [];
+    static $settings = array();
 
     # the classes are search 
-    static $class_search_paths = [];
+    static $class_search_paths = array();
 
     # Default file patterns to be searched in class_search_paths.
     # Requiring class 'BaseFoo' will search for c.basefoo.php, basefoo.class.php and cla_basefoo.php
-    static $class_search_patterns = [ 'c.%s.php', '%s.class.php', 'cla_%s.php' ];
+    static $class_search_patterns = array( 'c.%s.php', '%s.class.php', 'cla_%s.php' );
 
     # config passed in by s::configure()
     static $config = null;
@@ -139,7 +139,7 @@ class S {
 
     static function configure($config = null)
     {
-        if ( ! $config)                       $config = [];
+        if ( ! $config)                       $config = array();
         if ( ! isset($config['db.engine']))   $config['db.engine'] = null;
 
         s::$config = $config;
@@ -197,7 +197,7 @@ class S {
     {
         if (sizeof(s::$settings) === 1) {
             # you want to run with empty settings? ok, why not
-            s::configure([]);
+            s::configure(array());
         }
  
 
@@ -229,7 +229,7 @@ class S {
         s::set('action', $action);
 
         if ($action == 'install') {  // shortcut without invoking get_routes
-            $routes = ['install' => 'on_stitches_install'];
+            $routes = array('install' => 'on_stitches_install');
         } else {
             $routes = s::get_routes();
         }
@@ -412,13 +412,13 @@ class S {
     static function get_routes()
     {
         if ( ! ($routes = s::get('routes'))) {
-            $route_defaults = [
+            $route_defaults = array(
                 'run-tests' => 'on_stitches_unittests',
                 'install' => 'on_stitches_install',
                 'admin/tests' => 'on_stitches_unittests',
                 'admin/install' => 'on_stitches_install',
                 'robots.txt' => 'on_stitches_robots_txt',
-            ];
+            );
 
             $routes = s::emit('routes', $route_defaults);
             $routes = s::process_route_macros($routes);
@@ -433,7 +433,7 @@ class S {
 
     protected static function process_route_macros($routes)
     {
-        $processed = [];
+        $processed = array();
         foreach($routes as $k=>$v) {
             if (strpos($k, '%') !== false) {
                 $k = str_replace('/', '\\/', $k);
@@ -514,7 +514,7 @@ class S {
 
         if (strpos($signature, '::')) {
             list($classname, $function) = explode('::', $signature);
-            $call = [trim($classname), trim($function)];
+            $call = array(trim($classname), trim($function));
         } else {
             list($file, $func) = explode(':', trim($signature) . ':');
             if ($func) {
@@ -605,7 +605,7 @@ class S {
     #
     # Return failure(..) from a listener to break this event.
 
-    static $ev_listeners = [];
+    static $ev_listeners = array();
 
     # s::on
     # -----
@@ -644,7 +644,7 @@ class S {
 
     static function emit($ev_name, $param = null)
     {
-        foreach(get_array($ev_name, s::$ev_listeners, []) as $listener) {
+        foreach(get_array($ev_name, s::$ev_listeners, array()) as $listener) {
             $ret = s::call($listener, $param);
             $param = ($ret === null) ? $param : $ret;
             if (failed($param)) break;
@@ -744,9 +744,9 @@ function on_stitches_robots_txt()
 {
     Page::set_plain_output();
 
-    $robot_tags = [
+    $robot_tags = array(
         '/' => (bool)s::get('cfg:site.is-production')
-    ];
+    );
 
     $robot_tags = s::emit('robots', $robot_tags);
 

@@ -3,16 +3,16 @@
 class Installer {
 
     # class prefixes that are searched by installer
-    static $class_prefix_order = [
+    static $class_prefix_order = array(
         'inst_',     // install tables
         'patch_',    // alter tables
         'populate_', // fill empty tables with data
         'fix_',      // any other fixes
-    ];
+    );
 
     # { class_name => installation_status } is gathered here in response to
     # 'install' event.
-    static $steps = [];
+    static $steps = array();
 
 
     # Use Installer::load() to autoinclude all of the installer class definitions

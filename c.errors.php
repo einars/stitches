@@ -217,7 +217,7 @@ function errors_default_handler($errno, $message)
 
     $max_reported_errors = 10;
 
-    $deadly_errors = [E_ERROR, E_PARSE, E_USER_ERROR, E_CORE_ERROR];
+    $deadly_errors = array(E_ERROR, E_PARSE, E_USER_ERROR, E_CORE_ERROR);
     $is_fatal = in_array($errno, $deadly_errors);
 
     $show_params = true;

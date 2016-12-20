@@ -259,7 +259,7 @@ function get_adjustment($r, $field)
 
 function get_recdef($r)
 {
-    $o = [];
+    $o = array();
     foreach($r['fields'] as $f) {
         $name = $f['name'];
         $spacer = get_adjustment($r, $f);
@@ -304,7 +304,7 @@ function get_vardef($r)
         'money'=> 'null',
     );
 
-    $o = [];
+    $o = array();
     foreach($r['fields'] as $f) {
         $name = $f['name'];
         $adj = get_adjustment($r, $f);
@@ -317,7 +317,7 @@ function get_vardef($r)
 
 function get_fetchdef($r)
 {
-    $o = [];
+    $o = array();
     foreach($r['fields'] as $f) {
         $name = $f['name'];
         $adj = get_adjustment($r, $f);
@@ -371,7 +371,7 @@ function get_dbdef($r)
 
 function get_postdef($r)
 {
-    $o = [];
+    $o = array();
     foreach($r['fields'] as $f) {
 
         $name = $f['name'];
@@ -413,7 +413,7 @@ function indent($lines, $spaces = 4)
 {
     if ( ! $lines) return;
     $indentation = str_repeat(' ', $spaces);
-    $out = [];
+    $out = array();
     foreach($lines as $line) {
         $out[] = $indentation . trim($line);
     }
@@ -434,7 +434,7 @@ function output_model($r)
     $dbdef = get_dbdef($r);
     $postdef = indent(get_postdef($r), 12);
 
-    $known_fields = [];
+    $known_fields = array();
     foreach($r['fields'] as $f) {
         $known_fields[] = "'" . $f['name'] . "'";
     }
@@ -456,9 +456,9 @@ class {$classname}Model extends BaseModel
 $vardef
     var \$_underlying_table = '$table';
     var \$_primary_key = '$id';
-    var \$_known_fields = [
+    var \$_known_fields = array(
         $known_fields
-    ];
+    );
 
     function __construct(\${$id} = null)
     {
@@ -507,9 +507,9 @@ $postdef
             }
             return \$notice;
         }
-        \$rec = [
+        \$rec = array(
 $recdef
-        ];
+        );
         if (s::get('models:use-history')) {
             history::db_replace('{$table}', \$rec, '$id');
         } else {
