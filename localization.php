@@ -60,5 +60,5 @@ function set_language($language)
 
 function languages()
 {
-    return s::event('languages', []);
+    return s::event('languages', array());
 }

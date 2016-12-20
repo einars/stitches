@@ -342,7 +342,7 @@ function get_boolfixdef($r)
     }
 
     if ($bools) {
-        return [sprintf("db::booleanize(\$r, '%s');", implode(', ', $bools))];
+        return array(sprintf("db::booleanize(\$r, '%s');", implode(', ', $bools)));
     }
 }
 
@@ -522,10 +522,10 @@ $recdef
 
     function broadcast_update()
     {
-        s::emit('models:update', [
+        s::emit('models:update', array(
             'name' => '$singular_lower',
             'model' =>  \$this
-        ]);
+        ));
         s::emit('models:update.$singular_lower', \$this);
     }
 }

@@ -102,12 +102,12 @@ class Form {
             if (is_string($notice)) {
                 $class = 'notice notice-success text-success bg-success';
                 $text = $notice;
-                Form::draw_static_text('text', ['', $notice, ['class' => 'notice notice-success']]);
+                Form::draw_static_text('text', array('', $notice, array('class' => 'notice notice-success')));
             } else {
                 $class = 'notice notice-failure text-danger bg-danger';
                 $text = failure_text($notice);
             }
-            Form::draw_static_text('text', ['', "<div class='$class'>$text</div>"]);
+            Form::draw_static_text('text', array('', "<div class='$class'>$text</div>"));
         }
     }
 
@@ -231,7 +231,7 @@ class Form {
         }
         switch($element_type) {
         case 'checkbox':
-            form::ctrl_checkbox($name, $value, $opts + ['label' => $opt_label]);
+            form::ctrl_checkbox($name, $value, $opts + array('label' => $opt_label));
             break;
         default:
             s::call('html::' . $element_type, $name, $value, $opts);
@@ -259,7 +259,7 @@ class Form {
         );
 
         if ($label || form::$grid['grid']) {
-            HTML::label($label, ['class' => [Form::$class_label, Form::$grid['label']]]);
+            HTML::label($label, array('class' => array(Form::$class_label, Form::$grid['label'])));
         }
 
         if ($label !== false) {
@@ -309,9 +309,9 @@ class Form {
             } else {
                 h('<label>', Form::$class_label);
             }
-            html::radio($name, ($k == $value), [
+            html::radio($name, ($k == $value), array(
                 'value' => $k,
-            ]);
+            ));
 
             echo $v; // non-escaped
 
@@ -331,7 +331,7 @@ class Form {
             , 'form-group-optiongroup'
         );
 
-        HTML::label($opt_label, ['class' => [Form::$class_label, Form::$grid['label']]]);
+        HTML::label($opt_label, array('class' => array(Form::$class_label, Form::$grid['label'])));
 
         h('<div class="%s">', Form::$grid['content']);
 

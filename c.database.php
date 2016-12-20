@@ -102,11 +102,11 @@ class Database {
         }
 
         // you may listen on 'query' events
-        s::emit('query', [
+        s::emit('query', array(
             'time'   => microtime(true) - $start_time,
             'query'  => $query,
             'result' => $query_result
-        ]);
+        ));
         return $query_result;
     }
 

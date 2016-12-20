@@ -289,11 +289,11 @@ function errors_default_handler($errno, $message)
             // in case the content type hasn't been specified yet, try forcing it
             header('Content-type: text/html; charset=utf-8');
         }
-        s::emit('error', [
+        s::emit('error', array(
             'message' => $message, 
             'trace' => $error_trace, 
             'is_fatal' => $is_fatal
-        ]);
+        ));
     }
 
 

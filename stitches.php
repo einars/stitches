@@ -245,7 +245,7 @@ class S {
         if (isset($routes[$action])) {
             // common case
             s::set('executed-action', $routes[$action]);
-            s::call_array($routes[$action], [null]);
+            s::call_array($routes[$action], array(null));
             $had_something_to_do = true;
         } else {
             // check regexps
@@ -403,9 +403,17 @@ class S {
 
     static function add_routes($routes)
     {
-        s::on('routes', function ($all_routes) use ($routes) {
-            return array_merge($all_routes, $routes);
-        });
+        $stored_routes = any(s::get('stored-routes'), array());
+        $stored_routes = array_merge($stored_routes, $routes);
+        s::set('stored-routes', $stored_routes);
+        s::on('routes', 's::add_stored_routes');
+    }
+
+    static function add_stored_routes($routes)
+    {
+        $stored_routes = any(s::get('stored-routes'), array());
+        s::set('stored_routes', array());
+        return array_merge($routes, $stored_routes);
     }
 
 
@@ -675,7 +683,7 @@ class S {
             if (is_string($callback)) {
                 unset(s::$ev_listeners[$ev_name][$callback]);
             } else {
-                s::$ev_listeners[$ev_name] = array_diff(s::$ev_listeners[$ev_name], [$callback]);
+                s::$ev_listeners[$ev_name] = array_diff(s::$ev_listeners[$ev_name], array($callback));
             }
         }
     }
