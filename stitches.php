@@ -16,7 +16,7 @@ class S {
     # all settings set by s::set('something') go here
     static $settings = array();
 
-    # the classes are search 
+    # the classes are search
     static $class_search_paths = array();
 
     # Default file patterns to be searched in class_search_paths.
@@ -59,7 +59,7 @@ class S {
             }
         }
 
-        { 
+        if ( ! defined('STITCHES_KEEP_REQUEST_ARRAYS')) {
             # Sanitize GET/POST/REQUEST by killing arrays.
             #
             # It's often easy to break php applications in hilarious ways, as
@@ -199,7 +199,7 @@ class S {
             # you want to run with empty settings? ok, why not
             s::configure(array());
         }
- 
+
 
         Session::initialize();
 
@@ -779,7 +779,7 @@ function on_stitches_robots_txt()
 #
 # If any settings were passed in the array for the s::configure, then  will
 # be treated as immutable and the s::configure version will always be used.
-# 
+#
 function stitches_configuration()
 {
     Config::define('debug.ip',           null,  'IP addresses for the debug mode');
@@ -792,7 +792,7 @@ function stitches_configuration()
 # on_stitches_default_index
 # -------------------------
 # Useless default handler for the root of site.
-# 
+#
 function on_stitches_default_index()
 {
     echo 'It works';
