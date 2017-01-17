@@ -26,7 +26,7 @@ class Session {
         }
 
 
-        if (s::db()) {
+        if (session::use_db()) {
 
             Session::$enabled = true;
             session_set_save_handler(
@@ -87,6 +87,13 @@ class Session {
             $max_activity = time() - 240 * 60; // 4h timeout
         }
         db::query('delete from sessions where last_access_time < %s', date('Y-m-d H:i', $max_activity));
+    }
+    static function use_db()
+    {
+        if ( ! s::db()) return false;
+        if (defined('STITCHES_INSTALLING')) return false;
+        if (get('db.alien', s::$config)) return false;
+        return true;
     }
 }
 
