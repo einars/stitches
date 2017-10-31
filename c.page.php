@@ -396,7 +396,7 @@ class Page {
     #
     static function output_json($something, $json_opts = null)
     {
-        Page::set_plain_output('text/plain');
+        Page::set_plain_output('text/json');
         echo json_encode($something, any($json_opts, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
     }
 
