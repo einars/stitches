@@ -416,7 +416,7 @@ class Page {
     #
     static function is_plain()
     {
-        return Page::is_ajax() || s::get('page:plain') || s::cli();
+        return Page::is_ajax() || s::get('page:plain') || s::cli() || strpos(get('HTTP_CONTENT_TYPE', $_SERVER), 'application/json') !== false;
     }
 
 

@@ -28,8 +28,6 @@ class Errors {
         $trace = $e['trace'];
         $is_fatal = $e['is_fatal'];
 
-        Errors::style();
-
         if (Page::is_plain()) {
             h("%s\n", $message);
             foreach($trace as $t) {
@@ -42,6 +40,16 @@ class Errors {
         } else {
             # wrapped in a table so it won't break if error happened while
             # drawing inside / alongside other tags.
+            echo "<!--\n";
+            h("%s\n", $message);
+            foreach($trace as $t) {
+                h("%s:%s %s\n"
+                    , $t['file']
+                    , $t['line']
+                    , $t['source']
+                );
+            }
+            echo "\n-->\n";
             h('<table class="stitches-failure %s">', $is_fatal ? 'stitches-error' : 'stitches-warning');
 
             h('<tr><th class="stitches-failure-text" colspan="2">%s</th></tr>', $message);
@@ -54,6 +62,8 @@ class Errors {
                 }
             }
             echo '</table>';
+            Errors::style();
+
         }
     }
 
