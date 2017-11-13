@@ -118,7 +118,7 @@ function booleanize($v)
     if ($v === false) return $v;
     if ( ! $v) return false;
 
-    return ($v === 'on' or $v[0] === 't' or $v[0] === 'T' or $v === 1);
+    return ($v === 'on' or $v[0] === 't' or $v[0] === 'T' or $v === 1 or $v === '1');
 }
 
 # absolute_url
