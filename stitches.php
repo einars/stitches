@@ -677,7 +677,7 @@ class S {
     # ------
     # Remove one or all listeners from the event.
     #
-    function off($ev_name, $callback = null)
+    static function off($ev_name, $callback = null)
     {
         if ($callback === null) {
             unset(s::$ev_listeners[$ev_name]);
