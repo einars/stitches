@@ -25,6 +25,9 @@ class Session {
             return;
         }
 
+        if ($session_lifetime = get('session.lifetime', s::$config)) {
+            session_set_cookie_params($session_lifetime);
+        }
 
         if (session::use_db()) {
 
@@ -40,9 +43,6 @@ class Session {
         }
 
         if ( ! session_id()) {
-            if ($session_lifetime = get('session.lifetime', s::$config)) {
-                session_set_cookie_params($session_lifetime);
-            }
             session_start();
         }
     }
