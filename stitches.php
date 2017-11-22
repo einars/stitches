@@ -244,6 +244,7 @@ class S {
 
         if (isset($routes[$action])) {
             // common case
+            s::set('route', $action);
             s::set('executed-action', $routes[$action]);
             s::call_array($routes[$action], array(null));
             $had_something_to_do = true;
@@ -257,6 +258,7 @@ class S {
                         $regexp .= '$';
                     }
                     if (preg_match("/$regexp/D", $action, $matches)) {
+                        s::set('route', $action);
                         s::set('executed-action', $func);
                         array_shift($matches);
                         s::call_array($func, $matches);
