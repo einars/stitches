@@ -229,7 +229,7 @@ class S {
         s::set('action', $action);
 
         if ($action == 'install') {  // shortcut without invoking get_routes
-            $routes = array('install' => 'on_stitches_install');
+            $routes = array('install' => ['function' => 'on_stitches_install', 'route' => 'install']);
         } else {
             $routes = s::get_routes();
         }
@@ -244,9 +244,9 @@ class S {
 
         if (isset($routes[$action])) {
             // common case
-            s::set('route', $action);
-            s::set('executed-action', $routes[$action]);
-            s::call_array($routes[$action], array(null));
+            s::set('route', $routes[$action]['route']);
+            s::set('executed-action', $routes[$action]['action']);
+            s::call_array($routes[$action]['action'], array(null));
             $had_something_to_do = true;
         } else {
             // check regexps
@@ -258,10 +258,10 @@ class S {
                         $regexp .= '$';
                     }
                     if (preg_match("/$regexp/D", $action, $matches)) {
-                        s::set('route', $action);
-                        s::set('executed-action', $func);
+                        s::set('route', $func['route']);
+                        s::set('executed-action', $func['action']);
                         array_shift($matches);
-                        s::call_array($func, $matches);
+                        s::call_array($func['action'], $matches);
                         $had_something_to_do = true;
                         break;
                     }
@@ -445,6 +445,7 @@ class S {
     {
         $processed = array();
         foreach($routes as $k=>$v) {
+            $original = $k;
             if (strpos($k, '%') !== false) {
                 $k = str_replace('/', '\\/', $k);
                 $k = str_replace('%ext', '(\.([a-zA-Z]+))?$', $k); // extension
@@ -456,7 +457,10 @@ class S {
                 $k = str_replace('%u', "($hex{8}-$hex{4}-$hex{4}-$hex{4}-$hex{12})", $k);
                 $k = '^' . $k . '$';
             }
-            $processed[$k] = $v;
+            $processed[$k] = [
+                'action' => $v,
+                'route' => $original,
+            ];
         }
         return $processed;
     }
