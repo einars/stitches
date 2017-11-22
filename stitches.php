@@ -691,6 +691,17 @@ class S {
     }
 
 
+    # s::header
+    # ---------
+    # Wrapper for header() function, takes CLI-mode into account
+    #
+    static function header($header, $value = null)
+    {
+        if ( ! s::cli()) {
+            header($header, $value);
+        }
+    }
+
 }
 
 function stitches_autoload($class_name)
