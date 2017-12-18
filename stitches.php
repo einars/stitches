@@ -270,7 +270,7 @@ class S {
         }
         if ( ! $had_something_to_do) {
             if ($catch_all_fn) {
-                $had_something_to_do = s::call($catch_all_fn, $action ? $action : '');
+                $had_something_to_do = s::call($catch_all_fn['action'], $action ? $action : '');
             }
             if ( ! $had_something_to_do) {
                 Errors::page_not_found(hs("Action %s not found.", $action));
@@ -518,7 +518,11 @@ class S {
                 }
 
                 // probably the filter itself will error or redirect already
-                $success = s::emit('permission-check', $permissions);
+                $success = s::emit('permission-check', [
+                    'permissions' => $permissions,
+                    'params' => $params,
+                    'function' => $signature,
+                ]);
                 if (failed($success)) {
                     return false;
                 }
