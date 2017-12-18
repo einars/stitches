@@ -350,7 +350,9 @@ class Database {
         $res = db::query($query);
         $out = array();
         while ($r = db::fetch_assoc($res)) {
-            list($field_name, $first_value) = each($r);
+            $ks = array_keys($r);
+            $field_name = $ks[0];
+            $first_value = $r[$field_name];
             if (isset($out[$first_value])) {
                 s::warning("Duplicate key «%s».\n%s", $first_value, $query);
             }
