@@ -117,17 +117,7 @@ class S {
         }
         S::add_class_path(dirname(__FILE__));
 
-        if (function_exists('spl_autoload_register')) {
-            spl_autoload_register('stitches_autoload');
-        }
-
-        if ( ! function_exists('spl_autoload_register') and ! function_exists('__autoload')) {
-            // old-school autload fallback
-            function __autoload($class_name) {
-                return stitches_autoload($class_name);
-            }
-
-        }
+        spl_autoload_register('stitches_autoload');
 
         Errors::load();
 
