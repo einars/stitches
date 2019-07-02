@@ -32,7 +32,9 @@ class Session {
         if (session::use_db()) {
 
             Session::$enabled = true;
-            session_set_save_handler(
+            // can't get around the 7.2+ warning about session being already active
+            // even if it's not started yet
+            @session_set_save_handler(
                 'sx_open',
                 'sx_close',
                 'sx_read',
