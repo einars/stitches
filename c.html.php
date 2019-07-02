@@ -187,7 +187,7 @@ class HTML {
     # html::file
     # ----------
     # input(type="file")
-    static function file($obj_name, $object = null, $opts = Null)
+    static function file($name, $object = null, $opts = Null)
     {
         normalize_options($opts);
 
