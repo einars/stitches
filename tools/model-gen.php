@@ -359,7 +359,7 @@ function get_dbdef($r)
                 $o[] = sprintf('unix_timestamp(%s) as %s',
                     $f['name'], $f['name']);
             } else {
-                $o[] = sprintf('%s::abstime::int as %s',
+                $o[] = sprintf('extract(epoch from %s)::int as %s',
                     $f['name'], $f['name']);
             }
         } else {
