@@ -163,7 +163,7 @@ class S {
 
         s::set('action', $action);
 
-        Config::load();
+        StConfig::load();
         s::on('configure', 'stitches_configuration');
 
         # verify debug mode and set 'debug' accordingly
@@ -194,7 +194,7 @@ class S {
         Session::initialize();
 
         if ( ! s::cli()) {
-            Page::set_canonical_url(get('REQUEST_URI', $_SERVER));
+            StPage::set_canonical_url(get('REQUEST_URI', $_SERVER));
         }
 
         try {
@@ -269,7 +269,7 @@ class S {
 
         $c = ob_get_clean();
 
-        Page::present($c); // wraps all to a nice html
+        StPage::present($c); // wraps all to a nice html
 
         exit;
     }
@@ -312,7 +312,7 @@ class S {
             return isset($_SESSION) ? get($key, $_SESSION) : null;
         case 'cfg':
         case 'config':
-            return Config::get($key);
+            return StConfig::get($key);
         case 'cache':
             return Cache::get($key, $opts);
         default:
@@ -340,7 +340,7 @@ class S {
             break;
         case 'cfg':
         case 'config':
-            Config::set($key, $value);
+            StConfig::set($key, $value);
             break;
         case 'cache':
             return Cache::set($key, $value);
@@ -761,7 +761,7 @@ function on_stitches_install()
 #
 function on_stitches_robots_txt()
 {
-    Page::set_plain_output();
+    StPage::set_plain_output();
 
     $robot_tags = array(
         '/' => (bool)s::get('cfg:site.is-production')
@@ -793,10 +793,10 @@ function on_stitches_robots_txt()
 #
 function stitches_configuration()
 {
-    Config::define('debug.ip',           null,  'IP addresses for the debug mode');
-    Config::define('debug.enabled',      false, 'Global debug mode');
-    Config::define('debug.sql',          true,  'Show SQL dumps in the debug mode?');
-    Config::define('site.is-production', false, 'Production flag');
+    StConfig::define('debug.ip',           null,  'IP addresses for the debug mode');
+    StConfig::define('debug.enabled',      false, 'Global debug mode');
+    StConfig::define('debug.sql',          true,  'Show SQL dumps in the debug mode?');
+    StConfig::define('site.is-production', false, 'Production flag');
 }
 
 
@@ -816,7 +816,7 @@ function on_stitches_default_index()
 function stitches_debug_message($message)
 {
     if ( ! s::is_debug_mode()) return;
-    if (Page::is_plain()) {
+    if (StPage::is_plain()) {
         printf("%s %s\n", date('Y-m-d H:i'), $message);
     } else {
         h('<p class="stitches-debug">%s</p>', $message);

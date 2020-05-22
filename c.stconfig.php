@@ -6,10 +6,10 @@
 #
 # Define configuration value:
 #
-# Config::
+# StConfig::
 #   TK
 
-class Config {
+class StConfig {
     static $values = array();
     static $types = array();
 
@@ -17,24 +17,24 @@ class Config {
 
     static function load()
     {
-        s::on('install', 'Config::install');
+        s::on('install', 'StConfig::install');
     }
 
     static function initialize()
     {
         // just fetch settings from db
-        if (Config::$initialized) return;
-        Config::$initialized = true;
+        if (StConfig::$initialized) return;
+        StConfig::$initialized = true;
 
-        if ( ! Config::use_db()) {
+        if ( ! StConfig::use_db()) {
             return; // don't do anything
         }
 
         $res = db::query('select setting, value, type, default_value from configuration');
         while($r = db::fetch($res)) {
             $value = $r['value'] === null ? $r['default_value'] : $r['value'];
-            Config::$values[$r['setting']] = Config::deserialize($value, $r['type']);
-            Config::$types[$r['setting']] = $r['type'];
+            StConfig::$values[$r['setting']] = StConfig::deserialize($value, $r['type']);
+            StConfig::$types[$r['setting']] = $r['type'];
         }
     }
 
@@ -59,7 +59,7 @@ class Config {
         case 'bool':
             if ($value === true) return 'true';
             if ($value === false) return 'false';
-            s::error('Config::serialize: cannot serialize %s to bool.', repr($value));
+            s::error('StConfig::serialize: cannot serialize %s to bool.', repr($value));
         case 'int':
             if (is_int($value)) {
                 return sprintf('%d', $value);
@@ -79,36 +79,36 @@ class Config {
             return s::$config[$setting];
         }
 
-        if ( ! Config::$initialized) Config::initialize();
+        if ( ! StConfig::$initialized) StConfig::initialize();
 
-        if ( ! array_key_exists($setting, Config::$values)) {
+        if ( ! array_key_exists($setting, StConfig::$values)) {
             // attempt to reload configuration: possibly code has changed
             s::emit('configure');
-            if ( ! array_key_exists($setting, Config::$values)) {
+            if ( ! array_key_exists($setting, StConfig::$values)) {
                 s::error('Unknown configuration setting %s', $setting);
             }
         }
 
-        return Config::$values[$setting];
+        return StConfig::$values[$setting];
     }
 
     static function set($setting, $value)
     {
-        if ( ! Config::$initialized) Config::initialize();
+        if ( ! StConfig::$initialized) StConfig::initialize();
 
-        if ( ! array_key_exists($setting, Config::$values)) {
+        if ( ! array_key_exists($setting, StConfig::$values)) {
             // attempt to reload configuration: possibly code has changed
             s::emit('configure');
-            if ( ! array_key_exists($setting, Config::$values)) {
+            if ( ! array_key_exists($setting, StConfig::$values)) {
                 s::error('Unknown configuration setting %s', $setting);
             }
         }
 
-        if (Config::$values[$setting] == $value) return;
+        if (StConfig::$values[$setting] == $value) return;
 
-        if (Config::use_db()) {
+        if (StConfig::use_db()) {
             db::query('update configuration set value=%s where setting=%s'
-                , config::serialize($value, Config::$types[$setting])
+                , config::serialize($value, StConfig::$types[$setting])
                 , $setting
             );
         }
@@ -120,7 +120,7 @@ class Config {
         // Defines generally happen _only_ after a previously-unknown setting
         // is requested, and on installation.
 
-        if ( ! Config::$initialized) Config::initialize();
+        if ( ! StConfig::$initialized) StConfig::initialize();
 
         $type = 'string';
         if (is_int($default_value)) {
@@ -129,17 +129,17 @@ class Config {
             $type = 'bool';
         }
 
-        if ( ! Config::use_db()) {
+        if ( ! StConfig::use_db()) {
             # run with default values while installing
-            Config::$values[$setting]   = $default_value;
-            Config::$types[$setting]    = $type;
+            StConfig::$values[$setting]   = $default_value;
+            StConfig::$types[$setting]    = $type;
             return;
         }
 
 
-        $default_value_s = Config::serialize($default_value, $type);
+        $default_value_s = StConfig::serialize($default_value, $type);
 
-        if ( ! array_key_exists($setting, Config::$values)) {
+        if ( ! array_key_exists($setting, StConfig::$values)) {
             // new, unknown setting
             db::insert('configuration', array(
                 'setting' => $setting,
@@ -149,8 +149,8 @@ class Config {
                 'description' => $description,
             ));
 
-            Config::$values[$setting]   = $default_value;
-            Config::$types[$setting]    = $type;
+            StConfig::$values[$setting]   = $default_value;
+            StConfig::$types[$setting]    = $type;
         } else {
             // maybe update an existing setting
             $existing = db::get('select type, default_value, description from configuration where setting=%s', $setting);
@@ -168,7 +168,7 @@ class Config {
 
     static function install()
     {
-        if ( ! Config::use_db()) {
+        if ( ! StConfig::use_db()) {
             return;
         }
 
@@ -192,7 +192,7 @@ create table configuration(
 
     static function deprecate($setting)
     {
-        if (Config::use_db()) {
+        if (StConfig::use_db()) {
             db::query('update configuration set is_deprecated=true where setting=%s', $setting);
         }
     }

@@ -522,7 +522,7 @@ function get_uuid()
 #
 function dump($v, $opts = null)
 {
-    if (! Page::is_plain()) {
+    if (! StPage::is_plain()) {
         echo '<pre class="debug debug-dump">';
         echo str_replace(' ', '&nbsp;', htmlspecialchars(repr($v, $opts)));
         echo '</pre>';

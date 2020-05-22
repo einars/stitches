@@ -90,7 +90,7 @@ function focus_to($focus_to)
     $focused_on = $focus_to;
 
     $js = "$(':input[name=$focus_to]:visible').first().focus().select();";
-    Page::add_onload_js($js);
+    StPage::add_onload_js($js);
 }
 
 # print_notice

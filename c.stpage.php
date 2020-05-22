@@ -1,6 +1,6 @@
 <?php
 
-# Page
+# StPage
 # ====
 #
 # Various stuff that's relevant to page rendering and manipulation.
@@ -9,7 +9,7 @@
 # Problems:
 # currently you cannot customize error page (pretty_error_page) and it's ugly
 
-class Page {
+class StPage {
 
     static $title = 'Untitled';
     static $content_type = 'text/html; charset=utf-8';
@@ -33,7 +33,7 @@ class Page {
 
     static function add_rss($url, $title)
     {
-        Page::add_to_head(hs('<link rel="alternate" type="application/rss+xml" title="%s" href="%s">'
+        StPage::add_to_head(hs('<link rel="alternate" type="application/rss+xml" title="%s" href="%s">'
             , $title
             , $url
         ));
@@ -48,77 +48,77 @@ class Page {
 
     static function set_description($description)
     {
-        Page::$meta['description'] = strip_tags(str_replace("\n", '', $description));
+        StPage::$meta['description'] = strip_tags(str_replace("\n", '', $description));
     }
 
     static function set_title($title)
     {
-        Page::$title = $title;
+        StPage::$title = $title;
     }
 
     static function get_title()
     {
-        return Page::$title;
+        return StPage::$title;
     }
 
     static function set_meta($key, $meta)
     {
-        Page::$meta[$key] = $meta;
+        StPage::$meta[$key] = $meta;
     }
 
     static function get_meta($key)
     {
-        return get($key, Page::$meta);
+        return get($key, StPage::$meta);
     }
 
     static function add_to_head($html, $short_name = null)
     {
         if ($short_name === null) {
-            Page::$custom_head_html[$short_name]= $html;
+            StPage::$custom_head_html[$short_name]= $html;
         } else {
-            Page::$custom_head_html[]= $html;
+            StPage::$custom_head_html[]= $html;
         }
     }
 
     static function noindex()
     {
-        Page::set_meta('robots', 'noindex, nofollow');
+        StPage::set_meta('robots', 'noindex, nofollow');
     }
 
     #
-    # Page::add_script
+    # StPage::add_script
     # ----------------
     #
     # Add a link to some (javascript) file in the page head.
     #
     # Specify the optional $short_name to classify the scripts.
     #
-    #   Page::add_script('/path/to/jquery.js', 'jquery');
-    #   Page::add_script('/path/to/other.jquery.js', 'jquery'); // replaces previous
-    #   Page::add_script('/path/to/jquery-ui.js');
+    #   StPage::add_script('/path/to/jquery.js', 'jquery');
+    #   StPage::add_script('/path/to/other.jquery.js', 'jquery'); // replaces previous
+    #   StPage::add_script('/path/to/jquery-ui.js');
     # 
     static function add_script($url, $short_name = null)
     {
         if ($short_name) {
-            Page::$scripts[$type] = $url;
+            StPage::$scripts[$type] = $url;
         } else {
             $short_name = basename($url);
-            Page::$scripts[$short_name] = $url;
+            StPage::$scripts[$short_name] = $url;
         }
     }
 
-    # Page::add_stylesheet
+    # StPage::add_stylesheet
     # --------------------
     #
     # Add custom stylesheet.
     #
-    #   Page::add_stylesheet('/media/site.css');
-    #   Page::add_stylesheet('/media/print.css', 'print');
-    #   Page::add_stylesheet('/media/ie.css', 'all', 'IE');
+    #   StPage::add_stylesheet('/media/site.css');
+    #   StPage::add_stylesheet('/media/print.css', 'print');
+    #   StPage::add_stylesheet('/media/ie.css', 'all', 'IE');
     #
     static function add_stylesheet($url, $media = 'all', $conditional = null)
     {
-        Page::$stylesheets[] = array(
+        StPage::$stylesheets[] = array(
             'url' => $url,
             'media' => $media,
             'conditional' => $conditional
@@ -126,7 +126,7 @@ class Page {
     }
 
 
-    # Page::set_content_type
+    # StPage::set_content_type
     # ----------------------
     #
     # Change content type for the page.
@@ -134,50 +134,50 @@ class Page {
     #
     static function set_content_type($content_type)
     {
-        Page::$content_type = $content_type;
+        StPage::$content_type = $content_type;
     }
 
-    # Page::add_onload_js
+    # StPage::add_onload_js
     # -------------------
     # Add some short code to be added to the function to be called after the
     # page initialization.
     #
-    #   Page::add_onload_js('console.log("Page loaded.");');
+    #   StPage::add_onload_js('console.log("StPage loaded.");');
     #
     static function add_onload_js($js)
     {
-        Page::$onload_js .= $js . "\n";
+        StPage::$onload_js .= $js . "\n";
     }
 
-    # Page::add_style
+    # StPage::add_style
     # ---------------
     # Add some short css code to be added to <style> section in head.
     #
-    #   Page::add_style('.important { font-weight: bold }');
+    #   StPage::add_style('.important { font-weight: bold }');
     #
     static function add_style($css_code, $media = 'all')
     {
-        Page::$style[$media] = trim(get($media, Page::$style) . "\n" . $css_code);
+        StPage::$style[$media] = trim(get($media, StPage::$style) . "\n" . $css_code);
     }
 
 
-    # Page::set_favicon
+    # StPage::set_favicon
     # -----------------
     # Add a link in page head with favicon.
     #
     static function set_favicon($favicon_url)
     {
-        Page::$favicon = $favicon_url;
+        StPage::$favicon = $favicon_url;
     }
 
 
-    # Page::detect_favicon_type
+    # StPage::detect_favicon_type
     # -------------------------
     # Used internally to determine correct mime-type for the favicon.
     #
     static function detect_favicon_type()
     {
-        switch(substr(Page::$favicon, -4)) {
+        switch(substr(StPage::$favicon, -4)) {
         case '':
             return null;
         case '.png':
@@ -190,21 +190,21 @@ class Page {
     }
 
 
-    # Page::reload
+    # StPage::reload
     # ------------
     # Redirects user back to the same page that's currently requested
     #
     static function reload()
     {
-        Page::redirect(get('REQUEST_URI', $_SERVER));
+        StPage::redirect(get('REQUEST_URI', $_SERVER));
     }
 
 
-    # Page::redirect
+    # StPage::redirect
     # --------
     # Redirect to some path. Does not return.
     #
-    #  Page::redirect('/logout');
+    #  StPage::redirect('/logout');
     #
     static function redirect($url = '?', $response_code = 302)
     {
@@ -221,7 +221,7 @@ class Page {
                 // don't do actual redirect if the page already has any output
                 if ( ! headers_sent()) {
                     // set content type just in case
-                    header('Content-type: ' . Page::$content_type);
+                    header('Content-type: ' . StPage::$content_type);
                 }
                 echo $text_so_far;
                 if ($url == '?') {
@@ -243,7 +243,7 @@ class Page {
     }
 
 
-    # Page::present
+    # StPage::present
     # ---------------
     # The main render function that takes some content, wraps it into chrome/wrapper
     # (by passing through content event filter) and displays it.
@@ -254,11 +254,11 @@ class Page {
     static function present($content)
     {
         if ( ! s::cli() && ! headers_sent()) {
-            header('Content-type: ' . Page::$content_type);
+            header('Content-type: ' . StPage::$content_type);
         }
 
         # no need for wrappers
-        if (Page::is_plain()) {
+        if (StPage::is_plain()) {
             echo $content;
             return;
         }
@@ -280,7 +280,7 @@ class Page {
         // you may want to print something in response to page:head-start
         s::emit('page:head-start');
 
-        foreach(Page::$meta as $key=>$meta) {
+        foreach(StPage::$meta as $key=>$meta) {
             if ( ! $meta) continue;
 
             if ($key === 'charset') {
@@ -293,16 +293,16 @@ class Page {
             }
         }
 
-        if (Page::$favicon) {
+        if (StPage::$favicon) {
             h('<link rel="icon" href="%s" type="%s" />'
-                , Page::$favicon
-                , Page::detect_favicon_type()
+                , StPage::$favicon
+                , StPage::detect_favicon_type()
             );
         }
 
-        h('<title>%s</title>', strip_tags(Page::$title));
+        h('<title>%s</title>', strip_tags(StPage::$title));
 
-        foreach(array_reverse(Page::$stylesheets) as $entry) {
+        foreach(array_reverse(StPage::$stylesheets) as $entry) {
             if ($entry['conditional']) {
                 printf("\n<!--[if %s]>\n", $entry['conditional']);
             }
@@ -312,36 +312,36 @@ class Page {
             }
         }
 
-        foreach(array_filter(Page::$style) as $media => $css) {
+        foreach(array_filter(StPage::$style) as $media => $css) {
             printf('<style type="text/css" media="%s">%s</style>'
                 , $media
                 , $css
             );
         }
 
-        if (Page::$scripts) {
-            foreach(Page::$scripts as $script) {
+        if (StPage::$scripts) {
+            foreach(StPage::$scripts as $script) {
                 printf('<script type="text/javascript" src="%s"></script>', $script);
             }
         }
 
-        if (Page::$onload_js) {
+        if (StPage::$onload_js) {
             echo '<script type="text/javascript">';
-            echo '$(function () {', Page::$onload_js, ' } )';
+            echo '$(function () {', StPage::$onload_js, ' } )';
             echo '</script>';
         }
 
 
-        if (Page::$custom_head_html) {
-            echo implode("\n", Page::$custom_head_html);
+        if (StPage::$custom_head_html) {
+            echo implode("\n", StPage::$custom_head_html);
         }
 
         // you may want to print something in response to page:head-end
         s::emit('page:head-end');
         echo '</head>';
 
-        if (Page::$body_classes) {
-            h('<body class="%s">', implode(' ', Page::$body_classes));
+        if (StPage::$body_classes) {
+            h('<body class="%s">', implode(' ', StPage::$body_classes));
         } else {
             echo '<body>';
         }
@@ -361,7 +361,7 @@ class Page {
     }
 
 
-    # Page::set_plain_output
+    # StPage::set_plain_output
     # ----------------------
     # Output custom content_type, disable html wrappers.
     #
@@ -372,7 +372,7 @@ class Page {
     #
     #    function on_check_status()
     #    {
-    #      Page::set_plain_output();
+    #      StPage::set_plain_output();
     #      echo 'Ok';
     #    }
     #
@@ -381,14 +381,14 @@ class Page {
         if ( ! s::cli() and ! headers_sent()) {
             header('Content-type: ' . $content_type);
         }
-        Page::set_content_type($content_type);
+        StPage::set_content_type($content_type);
         s::set('page:plain');
     }
 
 
 
 
-    # Page::output_json
+    # StPage::output_json
     # -----------------
     # Output json data
     #
@@ -396,14 +396,14 @@ class Page {
     #
     static function output_json($something, $json_opts = null)
     {
-        Page::set_plain_output('text/json');
+        StPage::set_plain_output('text/json');
         echo json_encode($something, any($json_opts, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
     }
 
 
 
 
-    # Page::is_plain
+    # StPage::is_plain
     # --------------
     # Returns true/false, depending on whether current execution
     # context asks for a plain output, or decorated (passed through
@@ -416,13 +416,13 @@ class Page {
     #
     static function is_plain()
     {
-        return Page::is_ajax() || s::get('page:plain') || s::cli() || strpos(get('HTTP_CONTENT_TYPE', $_SERVER), 'application/json') !== false;
+        return StPage::is_ajax() || s::get('page:plain') || s::cli() || strpos(get('HTTP_CONTENT_TYPE', $_SERVER), 'application/json') !== false;
     }
 
 
 
 
-    # Page::is_ajax
+    # StPage::is_ajax
     # --------------
     # Returns true if the page was requested via xmlhttprequest.
     #
@@ -437,7 +437,7 @@ class Page {
 
 
 
-    # Page::set_canonical_url
+    # StPage::set_canonical_url
     # -----------------------
     # Adds a <link rel="canonical"> to page head containing
     # page url with a leading '/'. Leading slash is enforced.
@@ -446,10 +446,10 @@ class Page {
     #
     # Repeated calls replace the value set by the previous calls.
     #
-    #   Page::set_canonical_url('/foo/');
+    #   StPage::set_canonical_url('/foo/');
     #   > <link rel="canonical" href="/foo/">
     #
-    #   Page::set_canonical_url('/foo');
+    #   StPage::set_canonical_url('/foo');
     #   > <link rel="canonical" href="/foo/">
     #
     static function set_canonical_url($canonical_url)
@@ -462,7 +462,7 @@ class Page {
 
         $canonical_url = rtrim($canonical_url, '/') . '/';
 
-        Page::add_to_head(sprintf('<link rel="canonical" href="%s">', $canonical_url), 'canonical-url');
+        StPage::add_to_head(sprintf('<link rel="canonical" href="%s">', $canonical_url), 'canonical-url');
     }
 
 

@@ -28,7 +28,7 @@ class Errors {
         $trace = $e['trace'];
         $is_fatal = $e['is_fatal'];
 
-        if (Page::is_plain()) {
+        if (StPage::is_plain()) {
             h("%s\n", $message);
             foreach($trace as $t) {
                 h("%s:%s %s\n"
@@ -133,7 +133,7 @@ class Errors {
         if (s::is_debug_mode()) {
             s::error('Request failed: %s', $message);
         } else {
-            Page::pretty_error_page($header, $message);
+            StPage::pretty_error_page($header, $message);
             exit;
         }
 
@@ -172,12 +172,12 @@ class Errors {
     static function style()
     {
 
-        if (Page::is_plain()) return;
+        if (StPage::is_plain()) return;
 
         static $run_once = 0;
         if ($run_once++) return;
 
-        // echo instead of Page::add_style because error might've been fatal,
+        // echo instead of StPage::add_style because error might've been fatal,
         // so the wrapper handlers will never get called, and there might never
         // be a chance to display stylesheet otherwise.
         //
@@ -308,7 +308,7 @@ function errors_default_handler($errno, $message)
 
 
     if ($reported_error_count == $max_reported_errors) {
-        if (Page::is_plain()) {
+        if (StPage::is_plain()) {
             echo 'Too many errors.';
         } else {
             h('<p>%s</p>', 'Too many errors.');
@@ -350,7 +350,7 @@ postgresql:   last_seen timestamp with time zone,
 
 function errors_configure()
 {
-    Config::define('errors.log-to-database', false, 'Log warnings and errors in the database?');
-    Config::define('errors.log-to-database.hide', false, 'Should the error messages be hidden after logging?');
+    StConfig::define('errors.log-to-database', false, 'Log warnings and errors in the database?');
+    StConfig::define('errors.log-to-database.hide', false, 'Should the error messages be hidden after logging?');
 }
 

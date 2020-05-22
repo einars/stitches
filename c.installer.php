@@ -63,7 +63,7 @@ class Installer {
 
             if (Installer::confirm($class_name)) {
                 if (Installer::exec_step($obj)) {
-                    Page::reload();
+                    StPage::reload();
                 } else {
                     $is_applied = false;
                     h('<p class="installer-message">%s</p>'
@@ -87,7 +87,7 @@ class Installer {
         }
 
         if ( ! $n_remaining) {
-            Page::add_style('.installer-autoinstall { display: none }');
+            StPage::add_style('.installer-autoinstall { display: none }');
             h('<p class="installer-success">%s</p>', 'Installation complete.');
             # reload configuration
             s::emit('configure');
@@ -148,7 +148,7 @@ class Installer {
         if (s::cli()) {
             exit;
         } else {
-            Page::redirect('/install');
+            StPage::redirect('/install');
         }
     }
 
