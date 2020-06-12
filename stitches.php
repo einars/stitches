@@ -825,5 +825,5 @@ function stitches_debug_message($message)
 
 function redirect($url)
 {
-    return page::redirect($url);
+    return STPage::redirect($url);
 }
