@@ -37,27 +37,6 @@ class S {
 
         s::set('start-time', microtime(true));
 
-        if (get_magic_quotes_gpc()) {
-
-            function __stripslashes_array(&$what)
-            {
-                if (is_array($what)) {
-                    array_walk($what, '__stripslashes_array');
-                } else {
-                    $what = stripslashes($what);
-                }
-            }
-
-            if ($_GET) {
-                array_walk($_GET,    '__stripslashes_array');
-            }
-            if ($_POST) {
-                array_walk($_POST,   '__stripslashes_array');
-            }
-            if ($_REQUEST) {
-                array_walk($_REQUEST, '__stripslashes_array');
-            }
-        }
 
         if ( ! defined('STITCHES_KEEP_REQUEST_ARRAYS')) {
             # Sanitize GET/POST/REQUEST by killing arrays.
