@@ -272,7 +272,7 @@ function errors_default_handler($errno, $message)
                     foreach($args as $arg) {
                         $repr_args[] = repr($arg);
                     }
-                    $repr_args = implode($repr_args, ', ');
+                    $repr_args = implode(', ', $repr_args);
                 }
                 $trace_entry['source'] = "$func($repr_args)";
             }
