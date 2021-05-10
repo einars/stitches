@@ -327,7 +327,7 @@ class Page {
 
         if (Page::$onload_js) {
             echo '<script type="text/javascript">';
-            echo '$(function () {', Page::$onload_js, ' } )';
+            echo 'document.addEventListener("DOMContentLoaded", function () {', Page::$onload_js, ' } )';
             echo '</script>';
         }
 
