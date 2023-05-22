@@ -132,7 +132,7 @@ class S {
             $get_action = get_string('action', $_GET);
             $post_action = get_string('action', $_POST);
 
-            $action = trim(any($post_action, $get_action), '/');
+            $action = trim(any($post_action, $get_action, ''), '/');
         }
 
         if ($action === 'install') {
@@ -674,7 +674,7 @@ class S {
     static function header($header, $value = null)
     {
         if ( ! s::cli()) {
-            header($header, $value);
+            header($header, $value ?? '');
         }
     }
 

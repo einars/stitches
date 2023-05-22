@@ -416,7 +416,7 @@ class Page {
     #
     static function is_plain()
     {
-        return Page::is_ajax() || s::get('page:plain') || s::cli() || strpos(get('HTTP_CONTENT_TYPE', $_SERVER), 'application/json') !== false;
+        return Page::is_ajax() || s::get('page:plain') || s::cli() || strpos(get('HTTP_CONTENT_TYPE', $_SERVER, ''), 'application/json') !== false;
     }
 
 
@@ -431,7 +431,7 @@ class Page {
     #
     static function is_ajax()
     {
-        return strtolower(get('HTTP_X_REQUESTED_WITH', $_SERVER)) === 'xmlhttprequest';
+        return strtolower(get('HTTP_X_REQUESTED_WITH', $_SERVER, '')) === 'xmlhttprequest';
     }
 
 
