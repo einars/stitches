@@ -477,7 +477,7 @@ function get_uuid()
 
     function r_htmlspecialchars($s)
     {
-        return nl2br(htmlspecialchars($s, ENT_QUOTES, 'UTF-8'));
+        return nl2br(htmlspecialchars($s ?? '', ENT_QUOTES, 'UTF-8'));
     }
 
     // htmlspecialchars + printf: all strings get htmlspecialchars treatment
