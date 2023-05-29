@@ -234,23 +234,6 @@ class Database {
     }
 
 
-    # db::get_object
-    # -------------
-    # Return first row of the results as an stdobj object.
-    #
-    # Related: db::get, db::get_assoc, db::get_num, db::get_object
-    # Related: db::fget, db::fget_assoc
-    #
-    static function get_object($query /*, ... */)
-    {
-        if (func_num_args() > 1) {
-            $args = func_get_args();
-            $query = db::sprintf_array($args);
-        }
-        return db::fetch_object(db::query($query));
-    }
-
-
     # db::get_num
     # -----------
     # Return first row of the results, numerically indexed.
@@ -671,21 +654,6 @@ class Database {
     {
         R::error('Not implemented');
     }
-
-    // no need to override this
-    static function fetch_object($query_id, $boolean_keys = null)
-    {
-        $x = db::fetch_assoc($query_id);
-        if ($x) {
-            if ($boolean_keys) {
-                db::fixup_booleans($x, $boolean_keys);
-            }
-            return (object)$x;
-        } else {
-            return null;
-        }
-    }
-
 
 
 
