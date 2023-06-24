@@ -24,7 +24,6 @@ class Page {
     static $favicon = null;
 
     static $meta = array(
-        'skype_toolbar' => 'skype_toolbar_parser_compatible',
         'charset' => 'utf-8',
         'viewport' => 'width=device-width, initial-scale=1',
     );
