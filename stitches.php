@@ -674,7 +674,7 @@ class S {
     static function header($header, $value = null)
     {
         if ( ! s::cli()) {
-            header($header, $value ?? '');
+            header($header, $value ? $value : '');
         }
     }
 

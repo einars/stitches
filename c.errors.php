@@ -254,7 +254,7 @@ function errors_default_handler($errno, $message)
             $func = "[$class]" . '->' . $func;
         }
 
-        $file = substr($n_file ?? '', strrpos($n_file ?? '', '/') + 1);
+        $file = substr($n_file ? $n_file : '', strrpos($n_file ? $n_file : '', '/') + 1);
 
         if ($file and $line) {
 
